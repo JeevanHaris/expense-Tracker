@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spendly — Reports</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .reports-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .chart-tall { height: 300px; }
+    @media (max-width: 900px) { .reports-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">Spend<span>ly</span></div>
+      <div class="logo-sub">Expense Tracker</div>
+    </div>
+    <nav class="nav-section">
+      <div class="nav-label">Menu</div>
+      <a href="../index.html" class="nav-link"><span class="icon">◈</span> Dashboard</a>
+      <a href="expenses.html" class="nav-link"><span class="icon">≡</span> Expenses</a>
+      <a href="reports.html" class="nav-link active"><span class="icon">◎</span> Reports</a>
+      <a href="categories.html" class="nav-link"><span class="icon">⊞</span> Categories</a>
+    </nav>
+    <div class="sidebar-footer">v1.0 &nbsp;·&nbsp; Spring Boot + JS</div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Reports</h1>
+        <p class="page-subtitle">Spending insights & analytics</p>
+      </div>
+    </div>
+
+    <div class="page-content fade-in">
+
+      <!-- Summary row -->
+      <div class="stats-grid" style="margin-bottom:32px" id="summary-stats">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+
+      <!-- Charts grid -->
+      <div class="reports-grid">
+
+        <!-- Monthly bar chart -->
+        <div class="card">
+          <div class="section-title">Monthly Trend (6 months)</div>
+          <div class="chart-container chart-tall">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Category pie -->
+        <div class="card">
+          <div class="section-title">This Month by Category</div>
+          <div class="chart-container chart-tall">
+            <canvas id="pieChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Category bar horizontal -->
+        <div class="card">
+          <div class="section-title">Category Comparison</div>
+          <div class="chart-container chart-tall">
+            <canvas id="catBarChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Budget vs actual -->
+        <div class="card">
+          <div class="section-title">Budget vs Actual (This Month)</div>
+          <div id="budget-table">
+            <div class="loading"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Top expenses table -->
+      <div class="card" style="margin-top:24px">
+        <div class="section-title">All Expenses This Month</div>
+        <div id="month-expenses">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/utils.js"></script>
+<script>
+let charts = {};
+
+async function loadReports() {
+  try {
+    const now = new Date();
+    const startOfMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-01';
+    const today = now.toISOString().split('T')[0];
+
+    const [summary, monthExpenses] = await Promise.all([
+      api.getSummary(),
+      api.getExpenses({ startDate: startOfMonth, endDate: today })
+    ]);
+
+    renderSummaryStats(summary);
+    renderMonthlyChart(summary.monthlyTotals);
+    renderPieChart(summary.categoryBreakdown);
+    renderCatBarChart(summary.categoryBreakdown);
+    renderBudgetTable(summary.categoryBreakdown);
+    renderMonthExpenses(monthExpenses);
+  } catch(e) {
+    showToast('Failed to load reports: ' + e.message, 'error');
+  }
+}
+
+function renderSummaryStats(s) {
+  const el = document.getElementById('summary-stats');
+  const thisM = parseFloat(s.totalThisMonth)||0;
+  const lastM = parseFloat(s.totalLastMonth)||0;
+  const diff = thisM - lastM;
+  const topCat = s.categoryBreakdown[0];
+  const avgDaily = thisM / new Date().getDate();
+
+  el.innerHTML = `
+    <div class="stat-card green"><div class="stat-label">This Month</div><div class="stat-value">${formatCurrency(thisM)}</div><div class="stat-change ${diff>0?'down':'up'}">${diff>=0?'↑':'↓'} ${formatCurrency(Math.abs(diff))} vs last month</div></div>
+    <div class="stat-card blue"><div class="stat-label">Daily Average</div><div class="stat-value">${formatCurrency(avgDaily)}</div><div class="stat-change">Per day this month</div></div>
+    <div class="stat-card yellow"><div class="stat-label">Top Category</div><div class="stat-value" style="font-size:20px">${topCat ? topCat.category : '—'}</div><div class="stat-change">${topCat ? formatCurrency(topCat.total) : 'No data'}</div></div>
+    <div class="stat-card red"><div class="stat-label">Transactions</div><div class="stat-value">${s.expenseCountThisMonth}</div><div class="stat-change">This month</div></div>
+  `;
+}
+
+function makeChart(id, type, data, options = {}) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id).getContext('2d');
+  charts[id] = new Chart(ctx, { type, data, options: { responsive:true, maintainAspectRatio:false, ...options } });
+}
+
+function renderMonthlyChart(months) {
+  makeChart('monthlyChart', 'bar', {
+    labels: months.map(m => m.month),
+    datasets: [{
+      label: 'Spending',
+      data: months.map(m => parseFloat(m.total)||0),
+      backgroundColor: months.map((_,i) => i===months.length-1 ? '#C8F06E' : 'rgba(200,240,110,0.2)'),
+      borderColor: '#C8F06E', borderWidth: 1, borderRadius: 6
+    }]
+  }, {
+    plugins: { legend: { display:false } },
+    scales: {
+      x: { grid: { color:'rgba(255,255,255,0.05)' }, ticks: { color:'#9B9A96', font:{family:'DM Sans',size:11} } },
+      y: { grid: { color:'rgba(255,255,255,0.05)' }, ticks: { color:'#9B9A96', font:{family:'DM Sans',size:11}, callback: v=>'₹'+v.toLocaleString('en-IN') } }
+    }
+  });
+}
+
+function renderPieChart(cats) {
+  if (!cats.length) return;
+  makeChart('pieChart', 'doughnut', {
+    labels: cats.map(c => c.category),
+    datasets: [{
+      data: cats.map(c => parseFloat(c.total)||0),
+      backgroundColor: cats.map(c => hexToRgba(c.color, 0.8)),
+      borderColor: cats.map(c => c.color),
+      borderWidth: 1.5, hoverOffset: 6
+    }]
+  }, {
+    cutout: '60%',
+    plugins: {
+      legend: { position:'right', labels:{ color:'#9B9A96', font:{family:'DM Sans',size:11}, padding:12, boxWidth:10 } }
+    }
+  });
+}
+
+function renderCatBarChart(cats) {
+  if (!cats.length) return;
+  makeChart('catBarChart', 'bar', {
+    labels: cats.map(c => c.category),
+    datasets: [{
+      label: 'Spent',
+      data: cats.map(c => parseFloat(c.total)||0),
+      backgroundColor: cats.map(c => hexToRgba(c.color, 0.7)),
+      borderColor: cats.map(c => c.color),
+      borderWidth: 1, borderRadius: 6
+    }]
+  }, {
+    indexAxis: 'y',
+    plugins: { legend: { display:false } },
+    scales: {
+      x: { grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#9B9A96',font:{family:'DM Sans',size:11}, callback:v=>'₹'+v.toLocaleString('en-IN')} },
+      y: { grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#9B9A96',font:{family:'DM Sans',size:11}} }
+    }
+  });
+}
+
+function renderBudgetTable(cats) {
+  const el = document.getElementById('budget-table');
+  const withBudget = cats.filter(c => c.budgetLimit);
+  if (!withBudget.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:30px"><p style="color:var(--text3)">No budgets set. Add budgets from the Categories page.</p></div>';
+    return;
+  }
+  el.innerHTML = withBudget.map(c => {
+    const spent = parseFloat(c.total)||0;
+    const budget = parseFloat(c.budgetLimit);
+    const pct = Math.min(spent/budget*100, 100).toFixed(1);
+    const over = spent > budget;
+    const near = spent/budget > 0.8 && !over;
+    const barColor = over ? 'var(--danger)' : near ? 'var(--warning)' : c.color;
+    return `<div style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cat-dot" style="background:${c.color}"></span>
+          <span style="font-size:14px;font-weight:500">${c.category}</span>
+          ${over ? '<span style="font-size:11px;color:var(--danger);background:rgba(255,107,107,0.1);padding:2px 8px;border-radius:4px">Over budget</span>' : ''}
+        </div>
+        <span style="font-size:13px;color:${over?'var(--danger)':near?'var(--warning)':'var(--text2)'}">
+          ${formatCurrency(spent)} / ${formatCurrency(budget)}
+        </span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">${pct}% used</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMonthExpenses(expenses) {
+  const el = document.getElementById('month-expenses');
+  if (!expenses.length) {
+    el.innerHTML = '<div class="empty-state"><p>No expenses this month</p></div>';
+    return;
+  }
+  el.innerHTML = `<table class="expense-table">
+    <thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Payment</th><th style="text-align:right">Amount</th></tr></thead>
+    <tbody>${expenses.map(e => `<tr>
+      <td style="font-weight:500">${e.title}</td>
+      <td>${e.category ? catBadge(e.category.name, e.category.color) : '—'}</td>
+      <td style="color:var(--text2);font-size:13px">${formatDate(e.date)}</td>
+      <td style="font-size:12px;color:var(--text2)">${paymentLabel(e.paymentMethod)}</td>
+      <td style="text-align:right"><span class="amount">${formatCurrency(e.amount)}</span></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+loadReports();
+</script>
+</body>
+</html>
