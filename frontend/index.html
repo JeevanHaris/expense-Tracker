@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,290 +8,296 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
+
 <body>
-<div class="app-shell">
+  <div class="app-shell">
 
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="logo">
-      <div class="logo-mark">Spend<span>ly</span></div>
-      <div class="logo-sub">Expense Tracker</div>
-    </div>
-    <nav class="nav-section">
-      <div class="nav-label">Menu</div>
-      <a href="index.html" class="nav-link active">
-        <span class="icon">◈</span> Dashboard
-      </a>
-      <a href="expenses.html" class="nav-link">
-        <span class="icon">≡</span> Expenses
-      </a>
-      <a href="reports.html" class="nav-link">
-        <span class="icon">◎</span> Reports
-      </a>
-      <a href="categories.html" class="nav-link">
-        <span class="icon">⊞</span> Categories
-      </a>
-    </nav>
-    <div class="sidebar-footer">v1.0 &nbsp;·&nbsp; Spring Boot + JS</div>
-  </aside>
-
-  <main class="main-content">
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">Dashboard</h1>
-        <p class="page-subtitle" id="today-label">Loading…</p>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">
+        <div class="logo-mark">Spend<span>ly</span></div>
+        <div class="logo-sub">Expense Tracker</div>
       </div>
-      <button class="btn btn-primary" onclick="openAddModal()">
-        <span>+</span> Add Expense
-      </button>
-    </div>
+      <nav class="nav-section">
+        <div class="nav-label">Menu</div>
+        <a href="index.html" class="nav-link active">
+          <span class="icon">◈</span> Dashboard
+        </a>
+        <a href="pages/expenses.html" class="nav-link">
+          <span class="icon">≡</span> Expenses
+        </a>
+        <a href="pages/reports.html" class="nav-link">
+          <span class="icon">◎</span> Reports
+        </a>
+        <a href="pages/categories.html" class="nav-link">
+          <span class="icon">⊞</span> Categories
+        </a>
+      </nav>
+      <div class="sidebar-footer">v1.0 &nbsp;·&nbsp; Spring Boot + JS</div>
+    </aside>
 
-    <div class="page-content fade-in">
-
-      <!-- Stats -->
-      <div class="stats-grid" id="stats-grid">
-        <div class="stat-card green">
-          <div class="stat-label">This Month</div>
-          <div class="stat-value" id="stat-month">—</div>
-          <div class="stat-change" id="stat-change">Loading…</div>
+    <main class="main-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle" id="today-label">Loading…</p>
         </div>
-        <div class="stat-card blue">
-          <div class="stat-label">This Year</div>
-          <div class="stat-value" id="stat-year">—</div>
-          <div class="stat-change" id="stat-year-label">Total 2025</div>
-        </div>
-        <div class="stat-card yellow">
-          <div class="stat-label">Transactions</div>
-          <div class="stat-value" id="stat-count">—</div>
-          <div class="stat-change">This month</div>
-        </div>
-        <div class="stat-card red">
-          <div class="stat-label">Last Month</div>
-          <div class="stat-value" id="stat-last">—</div>
-          <div class="stat-change">Previous period</div>
-        </div>
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <span>+</span> Add Expense
+        </button>
       </div>
 
-      <!-- Main grid -->
-      <div class="dash-grid">
+      <div class="page-content fade-in">
 
-        <!-- Left column -->
-        <div style="display:flex;flex-direction:column;gap:24px;">
-
-          <!-- Monthly trend chart -->
-          <div class="card">
-            <div class="section-title">Monthly Spending Trend</div>
-            <div class="chart-container">
-              <canvas id="trendChart"></canvas>
-            </div>
+        <!-- Stats -->
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card green">
+            <div class="stat-label">This Month</div>
+            <div class="stat-value" id="stat-month">—</div>
+            <div class="stat-change" id="stat-change">Loading…</div>
           </div>
-
-          <!-- Recent expenses -->
-          <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-              <div class="section-title" style="margin:0">Recent Expenses</div>
-              <a href="expenses.html" class="btn btn-ghost btn-sm">View all →</a>
-            </div>
-            <div id="recent-list">
-              <div class="loading"><div class="spinner"></div> Loading…</div>
-            </div>
+          <div class="stat-card blue">
+            <div class="stat-label">This Year</div>
+            <div class="stat-value" id="stat-year">—</div>
+            <div class="stat-change" id="stat-year-label">Total 2025</div>
           </div>
-
+          <div class="stat-card yellow">
+            <div class="stat-label">Transactions</div>
+            <div class="stat-value" id="stat-count">—</div>
+            <div class="stat-change">This month</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-label">Last Month</div>
+            <div class="stat-value" id="stat-last">—</div>
+            <div class="stat-change">Previous period</div>
+          </div>
         </div>
 
-        <!-- Right column -->
-        <div style="display:flex;flex-direction:column;gap:24px;">
+        <!-- Main grid -->
+        <div class="dash-grid">
 
-          <!-- Pie chart -->
-          <div class="card">
-            <div class="section-title">By Category</div>
-            <div class="chart-container" style="height:200px;">
-              <canvas id="catChart"></canvas>
+          <!-- Left column -->
+          <div style="display:flex;flex-direction:column;gap:24px;">
+
+            <!-- Monthly trend chart -->
+            <div class="card">
+              <div class="section-title">Monthly Spending Trend</div>
+              <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+              </div>
             </div>
+
+            <!-- Recent expenses -->
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                <div class="section-title" style="margin:0">Recent Expenses</div>
+                <a href="expenses.html" class="btn btn-ghost btn-sm">View all →</a>
+              </div>
+              <div id="recent-list">
+                <div class="loading">
+                  <div class="spinner"></div> Loading…
+                </div>
+              </div>
+            </div>
+
           </div>
 
-          <!-- Category breakdown -->
-          <div class="card">
-            <div class="section-title">Category Breakdown</div>
-            <div id="cat-breakdown">
-              <div class="loading"><div class="spinner"></div></div>
-            </div>
-          </div>
+          <!-- Right column -->
+          <div style="display:flex;flex-direction:column;gap:24px;">
 
+            <!-- Pie chart -->
+            <div class="card">
+              <div class="section-title">By Category</div>
+              <div class="chart-container" style="height:200px;">
+                <canvas id="catChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Category breakdown -->
+            <div class="card">
+              <div class="section-title">Category Breakdown</div>
+              <div id="cat-breakdown">
+                <div class="loading">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
-    </div>
-  </main>
-</div>
+    </main>
+  </div>
 
-<!-- Add Expense Modal -->
-<div class="modal-overlay" id="addModal">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 class="modal-title" id="modal-title">Add Expense</h2>
-      <button class="modal-close" onclick="closeAddModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <form id="expenseForm" onsubmit="submitExpense(event)">
-        <input type="hidden" id="editId">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Title *</label>
-            <input class="form-control" id="f-title" placeholder="e.g. Swiggy order" required>
+  <!-- Add Expense Modal -->
+  <div class="modal-overlay" id="addModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Add Expense</h2>
+        <button class="modal-close" onclick="closeAddModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="expenseForm" onsubmit="submitExpense(event)">
+          <input type="hidden" id="editId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Title *</label>
+              <input class="form-control" id="f-title" placeholder="e.g. Swiggy order" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (₹) *</label>
+              <input class="form-control" id="f-amount" type="number" step="0.01" min="0.01" placeholder="0.00"
+                required>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Amount (₹) *</label>
-            <input class="form-control" id="f-amount" type="number" step="0.01" min="0.01" placeholder="0.00" required>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Date *</label>
+              <input class="form-control" id="f-date" type="date" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-control" id="f-category">
+                <option value="">— Uncategorized —</option>
+              </select>
+            </div>
           </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Date *</label>
-            <input class="form-control" id="f-date" type="date" required>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select class="form-control" id="f-payment">
+                <option value="CASH">💵 Cash</option>
+                <option value="UPI">📱 UPI</option>
+                <option value="CARD">💳 Card</option>
+                <option value="BANK_TRANSFER">🏦 Bank Transfer</option>
+                <option value="OTHER">• Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Note</label>
+              <input class="form-control" id="f-note" placeholder="Optional note">
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Category</label>
-            <select class="form-control" id="f-category">
-              <option value="">— Uncategorized —</option>
-            </select>
+          <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
+            <button type="button" class="btn btn-ghost" onclick="closeAddModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="submit-btn">Save Expense</button>
           </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Payment Method</label>
-            <select class="form-control" id="f-payment">
-              <option value="CASH">💵 Cash</option>
-              <option value="UPI">📱 UPI</option>
-              <option value="CARD">💳 Card</option>
-              <option value="BANK_TRANSFER">🏦 Bank Transfer</option>
-              <option value="OTHER">• Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Note</label>
-            <input class="form-control" id="f-note" placeholder="Optional note">
-          </div>
-        </div>
-        <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px;">
-          <button type="button" class="btn btn-ghost" onclick="closeAddModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="submit-btn">Save Expense</button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
-<script src="js/api.js"></script>
-<script src="js/utils.js"></script>
-<script>
-let trendChart, catChart;
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    let trendChart, catChart;
 
-// Setup date label
-document.getElementById('today-label').textContent =
-  new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-document.getElementById('stat-year-label').textContent =
-  'Total ' + new Date().getFullYear();
+    // Setup date label
+    document.getElementById('today-label').textContent =
+      new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('stat-year-label').textContent =
+      'Total ' + new Date().getFullYear();
 
-async function loadDashboard() {
-  try {
-    const [summary, categories] = await Promise.all([api.getSummary(), api.getCategories()]);
-    renderStats(summary);
-    renderTrendChart(summary.monthlyTotals);
-    renderCatChart(summary.categoryBreakdown);
-    renderCatBreakdown(summary.categoryBreakdown);
-    renderRecent(summary.recentExpenses);
-    populateCategorySelect(categories);
-  } catch (e) {
-    showToast('Failed to load dashboard: ' + e.message, 'error');
-  }
-}
-
-function renderStats(s) {
-  document.getElementById('stat-month').textContent = formatCurrency(s.totalThisMonth);
-  document.getElementById('stat-year').textContent = formatCurrency(s.totalThisYear);
-  document.getElementById('stat-count').textContent = s.expenseCountThisMonth;
-  document.getElementById('stat-last').textContent = formatCurrency(s.totalLastMonth);
-
-  const thisM = parseFloat(s.totalThisMonth) || 0;
-  const lastM = parseFloat(s.totalLastMonth) || 0;
-  const changeEl = document.getElementById('stat-change');
-  if (lastM > 0) {
-    const pct = ((thisM - lastM) / lastM * 100).toFixed(1);
-    const up = thisM > lastM;
-    changeEl.className = 'stat-change ' + (up ? 'down' : 'up');
-    changeEl.textContent = (up ? '↑ ' : '↓ ') + Math.abs(pct) + '% vs last month';
-  } else {
-    changeEl.textContent = 'No data last month';
-  }
-}
-
-function renderTrendChart(months) {
-  const ctx = document.getElementById('trendChart').getContext('2d');
-  if (trendChart) trendChart.destroy();
-  trendChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: months.map(m => m.month),
-      datasets: [{
-        label: 'Spending',
-        data: months.map(m => parseFloat(m.total) || 0),
-        backgroundColor: months.map((_, i) => i === months.length-1 ? '#C8F06E' : 'rgba(200,240,110,0.25)'),
-        borderColor: months.map((_, i) => i === months.length-1 ? '#C8F06E' : 'rgba(200,240,110,0.4)'),
-        borderWidth: 1,
-        borderRadius: 6,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9B9A96', font: { family: 'DM Sans', size: 11 } } },
-        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9B9A96', font: { family: 'DM Sans', size: 11 }, callback: v => '₹' + v.toLocaleString('en-IN') } }
+    async function loadDashboard() {
+      try {
+        const [summary, categories] = await Promise.all([api.getSummary(), api.getCategories()]);
+        renderStats(summary);
+        renderTrendChart(summary.monthlyTotals);
+        renderCatChart(summary.categoryBreakdown);
+        renderCatBreakdown(summary.categoryBreakdown);
+        renderRecent(summary.recentExpenses);
+        populateCategorySelect(categories);
+      } catch (e) {
+        showToast('Failed to load dashboard: ' + e.message, 'error');
       }
     }
-  });
-}
 
-function renderCatChart(cats) {
-  const ctx = document.getElementById('catChart').getContext('2d');
-  if (catChart) catChart.destroy();
-  if (!cats.length) return;
-  catChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: cats.map(c => c.category),
-      datasets: [{
-        data: cats.map(c => parseFloat(c.total) || 0),
-        backgroundColor: cats.map(c => hexToRgba(c.color, 0.8)),
-        borderColor: cats.map(c => c.color),
-        borderWidth: 1.5,
-        hoverOffset: 6
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      cutout: '68%',
-      plugins: {
-        legend: { position: 'bottom', labels: { color: '#9B9A96', font: { family: 'DM Sans', size: 11 }, padding: 12, boxWidth: 10 } }
+    function renderStats(s) {
+      document.getElementById('stat-month').textContent = formatCurrency(s.totalThisMonth);
+      document.getElementById('stat-year').textContent = formatCurrency(s.totalThisYear);
+      document.getElementById('stat-count').textContent = s.expenseCountThisMonth;
+      document.getElementById('stat-last').textContent = formatCurrency(s.totalLastMonth);
+
+      const thisM = parseFloat(s.totalThisMonth) || 0;
+      const lastM = parseFloat(s.totalLastMonth) || 0;
+      const changeEl = document.getElementById('stat-change');
+      if (lastM > 0) {
+        const pct = ((thisM - lastM) / lastM * 100).toFixed(1);
+        const up = thisM > lastM;
+        changeEl.className = 'stat-change ' + (up ? 'down' : 'up');
+        changeEl.textContent = (up ? '↑ ' : '↓ ') + Math.abs(pct) + '% vs last month';
+      } else {
+        changeEl.textContent = 'No data last month';
       }
     }
-  });
-}
 
-function renderCatBreakdown(cats) {
-  const el = document.getElementById('cat-breakdown');
-  if (!cats.length) { el.innerHTML = '<div class="empty-state"><p>No data this month</p></div>'; return; }
-  const total = cats.reduce((s, c) => s + parseFloat(c.total), 0);
-  el.innerHTML = cats.map(c => {
-    const pct = total > 0 ? (parseFloat(c.total) / total * 100).toFixed(1) : 0;
-    const budget = c.budgetLimit ? parseFloat(c.budgetLimit) : null;
-    const spent = parseFloat(c.total);
-    const budgetPct = budget ? Math.min(spent / budget * 100, 100) : null;
-    const overBudget = budget && spent > budget;
-    const nearBudget = budget && spent / budget > 0.8 && !overBudget;
-    return `<div class="cat-item">
+    function renderTrendChart(months) {
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      if (trendChart) trendChart.destroy();
+      trendChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: months.map(m => m.month),
+          datasets: [{
+            label: 'Spending',
+            data: months.map(m => parseFloat(m.total) || 0),
+            backgroundColor: months.map((_, i) => i === months.length - 1 ? '#C8F06E' : 'rgba(200,240,110,0.25)'),
+            borderColor: months.map((_, i) => i === months.length - 1 ? '#C8F06E' : 'rgba(200,240,110,0.4)'),
+            borderWidth: 1,
+            borderRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9B9A96', font: { family: 'DM Sans', size: 11 } } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9B9A96', font: { family: 'DM Sans', size: 11 }, callback: v => '₹' + v.toLocaleString('en-IN') } }
+          }
+        }
+      });
+    }
+
+    function renderCatChart(cats) {
+      const ctx = document.getElementById('catChart').getContext('2d');
+      if (catChart) catChart.destroy();
+      if (!cats.length) return;
+      catChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: cats.map(c => c.category),
+          datasets: [{
+            data: cats.map(c => parseFloat(c.total) || 0),
+            backgroundColor: cats.map(c => hexToRgba(c.color, 0.8)),
+            borderColor: cats.map(c => c.color),
+            borderWidth: 1.5,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          cutout: '68%',
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#9B9A96', font: { family: 'DM Sans', size: 11 }, padding: 12, boxWidth: 10 } }
+          }
+        }
+      });
+    }
+
+    function renderCatBreakdown(cats) {
+      const el = document.getElementById('cat-breakdown');
+      if (!cats.length) { el.innerHTML = '<div class="empty-state"><p>No data this month</p></div>'; return; }
+      const total = cats.reduce((s, c) => s + parseFloat(c.total), 0);
+      el.innerHTML = cats.map(c => {
+        const pct = total > 0 ? (parseFloat(c.total) / total * 100).toFixed(1) : 0;
+        const budget = c.budgetLimit ? parseFloat(c.budgetLimit) : null;
+        const spent = parseFloat(c.total);
+        const budgetPct = budget ? Math.min(spent / budget * 100, 100) : null;
+        const overBudget = budget && spent > budget;
+        const nearBudget = budget && spent / budget > 0.8 && !overBudget;
+        return `<div class="cat-item">
       <div class="cat-info">
-        <div class="cat-color-ball" style="background:${hexToRgba(c.color,0.15)};color:${c.color}">${c.category[0]}</div>
+        <div class="cat-color-ball" style="background:${hexToRgba(c.color, 0.15)};color:${c.color}">${c.category[0]}</div>
         <div>
           <div style="font-size:14px;font-weight:500">${c.category}</div>
           <div style="font-size:12px;color:var(--text3)">${c.count} transactions · ${pct}%</div>
@@ -302,13 +309,13 @@ function renderCatBreakdown(cats) {
         ${budget ? `<div style="font-size:11px;color:var(--text3)">/ ${formatCurrency(budget)}</div>` : ''}
       </div>
     </div>`;
-  }).join('');
-}
+      }).join('');
+    }
 
-function renderRecent(list) {
-  const el = document.getElementById('recent-list');
-  if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>No expenses yet</h3></div>'; return; }
-  el.innerHTML = `<table class="expense-table">
+    function renderRecent(list) {
+      const el = document.getElementById('recent-list');
+      if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📭</div><h3>No expenses yet</h3></div>'; return; }
+      el.innerHTML = `<table class="expense-table">
     <thead><tr><th>Title</th><th>Category</th><th>Date</th><th style="text-align:right">Amount</th></tr></thead>
     <tbody>${list.map(e => `<tr>
       <td style="font-weight:500">${e.title}</td>
@@ -317,65 +324,66 @@ function renderRecent(list) {
       <td style="text-align:right"><span class="amount">${formatCurrency(e.amount)}</span></td>
     </tr>`).join('')}</tbody>
   </table>`;
-}
+    }
 
-function populateCategorySelect(cats) {
-  const sel = document.getElementById('f-category');
-  cats.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.id; opt.textContent = c.icon + ' ' + c.name;
-    sel.appendChild(opt);
-  });
-}
+    function populateCategorySelect(cats) {
+      const sel = document.getElementById('f-category');
+      cats.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id; opt.textContent = c.icon + ' ' + c.name;
+        sel.appendChild(opt);
+      });
+    }
 
-// Modal
-function openAddModal(expense = null) {
-  document.getElementById('modal-title').textContent = expense ? 'Edit Expense' : 'Add Expense';
-  document.getElementById('submit-btn').textContent = expense ? 'Update' : 'Save Expense';
-  document.getElementById('editId').value = expense ? expense.id : '';
-  document.getElementById('f-title').value = expense ? expense.title : '';
-  document.getElementById('f-amount').value = expense ? expense.amount : '';
-  document.getElementById('f-date').value = expense ? expense.date : new Date().toISOString().split('T')[0];
-  document.getElementById('f-category').value = expense?.category?.id || '';
-  document.getElementById('f-payment').value = expense?.paymentMethod || 'UPI';
-  document.getElementById('f-note').value = expense ? (expense.note || '') : '';
-  document.getElementById('addModal').classList.add('open');
-}
+    // Modal
+    function openAddModal(expense = null) {
+      document.getElementById('modal-title').textContent = expense ? 'Edit Expense' : 'Add Expense';
+      document.getElementById('submit-btn').textContent = expense ? 'Update' : 'Save Expense';
+      document.getElementById('editId').value = expense ? expense.id : '';
+      document.getElementById('f-title').value = expense ? expense.title : '';
+      document.getElementById('f-amount').value = expense ? expense.amount : '';
+      document.getElementById('f-date').value = expense ? expense.date : new Date().toISOString().split('T')[0];
+      document.getElementById('f-category').value = expense?.category?.id || '';
+      document.getElementById('f-payment').value = expense?.paymentMethod || 'UPI';
+      document.getElementById('f-note').value = expense ? (expense.note || '') : '';
+      document.getElementById('addModal').classList.add('open');
+    }
 
-function closeAddModal() {
-  document.getElementById('addModal').classList.remove('open');
-  document.getElementById('expenseForm').reset();
-}
+    function closeAddModal() {
+      document.getElementById('addModal').classList.remove('open');
+      document.getElementById('expenseForm').reset();
+    }
 
-async function submitExpense(e) {
-  e.preventDefault();
-  const btn = document.getElementById('submit-btn');
-  btn.textContent = 'Saving…'; btn.disabled = true;
-  const id = document.getElementById('editId').value;
-  const data = {
-    title: document.getElementById('f-title').value,
-    amount: parseFloat(document.getElementById('f-amount').value),
-    date: document.getElementById('f-date').value,
-    categoryId: document.getElementById('f-category').value || null,
-    paymentMethod: document.getElementById('f-payment').value,
-    note: document.getElementById('f-note').value || null
-  };
-  try {
-    if (id) { await api.updateExpense(id, data); showToast('Expense updated!'); }
-    else { await api.createExpense(data); showToast('Expense added!'); }
-    closeAddModal();
+    async function submitExpense(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.textContent = 'Saving…'; btn.disabled = true;
+      const id = document.getElementById('editId').value;
+      const data = {
+        title: document.getElementById('f-title').value,
+        amount: parseFloat(document.getElementById('f-amount').value),
+        date: document.getElementById('f-date').value,
+        categoryId: document.getElementById('f-category').value || null,
+        paymentMethod: document.getElementById('f-payment').value,
+        note: document.getElementById('f-note').value || null
+      };
+      try {
+        if (id) { await api.updateExpense(id, data); showToast('Expense updated!'); }
+        else { await api.createExpense(data); showToast('Expense added!'); }
+        closeAddModal();
+        loadDashboard();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = id ? 'Update' : 'Save Expense';
+      }
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('addModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeAddModal(); });
+
     loadDashboard();
-  } catch(err) {
-    showToast(err.message, 'error');
-  } finally {
-    btn.disabled = false; btn.textContent = id ? 'Update' : 'Save Expense';
-  }
-}
-
-// Close modal on backdrop click
-document.getElementById('addModal').addEventListener('click', e => { if(e.target === e.currentTarget) closeAddModal(); });
-
-loadDashboard();
-</script>
+  </script>
 </body>
+
 </html>

@@ -28,9 +28,9 @@ public class Budget {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal monthlyLimit;
 
-    @Column(nullable = false)
+    @Column(name = "\"month\"", nullable = false)
     private int month;
 
-    @Column(nullable = false)
+    @Column(name = "\"year\"", nullable = false)
     private int year;
 }
